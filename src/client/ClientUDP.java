@@ -13,6 +13,7 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashSet;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -339,7 +340,7 @@ public class ClientUDP {
                 return establishmentDate;
             } catch (InputMismatchException inputMismatchException) {
                 System.out.println("Date is a String object. Try again.");
-            } catch (IllegalArgumentException illegalArgumentException) {
+            } catch (IllegalArgumentException | DateTimeParseException dateTimeParseException) {
                 System.out.println("Invalid date format. Try again.");
             }
         }
