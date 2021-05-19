@@ -12,13 +12,13 @@ import java.util.HashMap;
 public class ServerUDP extends Thread{
     private DatagramSocket socket;
     private boolean running;
-    private byte[] bufReceive = new byte[256];
-    private byte[] bufSend = new byte[256];
-    HashMap<String, SimpleMethod> option;
+    private byte[] bufReceive = new byte[65535];
+    private byte[] bufSend = new byte[65535];
+    HashMap<String, SimpleMethod> option = new HashMap<>();
 
     public ServerUDP(CollectionAdministrator administrator){
         try{
-            socket = new DatagramSocket(4445);
+            socket = new DatagramSocket(4242);
         }
         catch (SocketException socketException){
             System.out.println("Something wrong with socket you chosen.");
@@ -41,6 +41,7 @@ public class ServerUDP extends Thread{
     }
 
     public void run (){
+        System.out.println("Server is online.");
         running = true;
         while(running){
             DatagramPacket packet = new DatagramPacket(bufReceive, bufReceive.length);

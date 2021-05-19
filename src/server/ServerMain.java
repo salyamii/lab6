@@ -1,11 +1,14 @@
 package server;
 
+import server.utility_methods.IsFileValid;
+
 import java.util.Scanner;
 
 public class ServerMain {
     public static void main(String[] args) {
         System.out.println("Server starts running...");
         try{
+            //C:\Users\happy\Desktop\xd\test.xml
             ServerUDP serverUDP = new ServerUDP(new CollectionAdministrator(args[0]));
             serverUDP.run();
         }
@@ -14,12 +17,13 @@ public class ServerMain {
                 System.out.print("Enter a correct path to the XML file: ");
                 Scanner in = new Scanner(System.in);
                 String path = in.nextLine();
+                if(!IsFileValid.run(path)){
+                    continue;
+                }
                 ServerUDP serverUDP = new ServerUDP(new CollectionAdministrator(path));
                 serverUDP.run();
             }
 
         }
-
-
     }
 }
