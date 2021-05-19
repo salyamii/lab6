@@ -3,6 +3,9 @@ package client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import server.data.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import java.io.IOException;
 import java.net.*;
@@ -20,9 +23,9 @@ public class ClientUDP {
     XmlMapper mapper = new XmlMapper();
     private boolean running;
     private final Scanner in = new Scanner(System.in);
-    HashSet<String> options;
-    private byte[] buf;
-    private byte[] bufFromServer;
+    HashSet<String> options = new HashSet<>();
+    private byte[] buf = new byte[65535];
+    private byte[] bufFromServer = new byte[65535];
     //Utility date formatters
     public static final String DATE_FORMATTER = "yyyy-MM-dd";
     public static final String DATE_TIME_FORMATTER = "yyyy-MM-dd HH:mm:ss";
@@ -57,6 +60,7 @@ public class ClientUDP {
 
     public void sendClient() {
         try{
+            running = true;
             while (running) {
                 System.out.print("Enter an option: ");
                 String option;
@@ -88,10 +92,12 @@ public class ClientUDP {
                         socket.send(packet);
                     }
                     else{
+
                         String out = optionSplitted.length == 1 ? optionSplitted[0] : optionSplitted[0] + " " + optionSplitted[1];
                         buf = out.getBytes();
                         DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445);
                         socket.send(packet);
+
                     }
                 }
                 catch (JsonProcessingException jsonProcessingException){
@@ -99,6 +105,7 @@ public class ClientUDP {
                 }
                 DatagramPacket packet = new DatagramPacket(bufFromServer, bufFromServer.length);
                 socket.receive(packet);
+                System.out.println("check");
                 String whatReceived = new String(packet.getData(), 0, packet.getLength());
                 System.out.println(whatReceived);
             }
