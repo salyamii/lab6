@@ -42,6 +42,7 @@ public class ClientUDP {
             System.out.println("The socket could not be opened, or the socket could not bind to the specified local port.");
         }
         options.add("help");
+        options.add("show");
         options.add("info");
         options.add("insert");
         options.add("update_id");
@@ -82,20 +83,20 @@ public class ClientUDP {
                     if(optionSplitted[0].equals("insert")){
                         String out = optionSplitted[0] + " " + mapper.writeValueAsString(makeCity());
                         buf = out.getBytes();
-                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445);
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
                         socket.send(packet);
                     }
                     else if(optionSplitted[0].equals("update_id")){
                         String out = optionSplitted[0] + " " + mapper.writeValueAsString(makeCity());
                         buf = out.getBytes();
-                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445);
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
                         socket.send(packet);
                     }
                     else{
 
                         String out = optionSplitted.length == 1 ? optionSplitted[0] : optionSplitted[0] + " " + optionSplitted[1];
                         buf = out.getBytes();
-                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445);
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
                         socket.send(packet);
 
                     }
