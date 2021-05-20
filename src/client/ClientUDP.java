@@ -1,11 +1,8 @@
 package client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+//import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import server.data.*;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import java.io.IOException;
 import java.net.*;
@@ -83,6 +80,7 @@ public class ClientUDP {
                 try{
                     if(optionSplitted[0].equals("insert")){
                         String out = optionSplitted[0] + " " + mapper.writeValueAsString(makeCity());
+                        System.out.println(out);
                         buf = out.getBytes();
                         DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
                         socket.send(packet);
@@ -102,7 +100,7 @@ public class ClientUDP {
 
                     }
                 }
-                catch (JsonProcessingException jsonProcessingException){
+                catch (Exception jsonProcessingException){
                     System.out.println("Processing exception when sending..");
                 }
                 DatagramPacket packet = new DatagramPacket(bufFromServer, bufFromServer.length);
@@ -157,7 +155,8 @@ public class ClientUDP {
     }
 
     public City makeCity(){
-        City city = new City(0, receiveName(), receiveCoordinates(), null,
+        LocalDateTime time = LocalDateTime.of(0,0,0,0,0,0);
+        City city = new City(0, receiveName(), receiveCoordinates(), time ,
                 receiveArea(), receivePopulation(), receiveMetersAboveSeaLevel(),
                 receiveEstablishmentDate(), receiveTelephoneCode(), receiveClimate(), receiveGovernor());
         return city;
