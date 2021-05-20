@@ -10,6 +10,6 @@ public class Show extends SimpleMethod{
 
     @Override
     public String run() {
-        return getAdministrator().getInfo();
+        return getAdministrator().getShow();
     }
 }

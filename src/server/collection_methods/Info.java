@@ -10,7 +10,6 @@ public class Info extends SimpleMethod{
 
     @Override
     public String run() {
-        getAdministrator().save();
         return getAdministrator().getInfo();
     }
 }

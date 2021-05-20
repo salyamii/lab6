@@ -733,7 +733,7 @@ public class CollectionAdministrator {
      * @return LocalDate establishmentDate
      */
     public LocalDate receiveEstablishmentDate() {
-        for (; ; ) {
+        for ( ; ; ) {
             try {
                 Scanner in = new Scanner(System.in);
                 System.out.println("Enter an establishment date in format yyyy-MM-dd.");
@@ -745,6 +745,26 @@ public class CollectionAdministrator {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMATTER);
                 LocalDate establishmentDate = LocalDate.parse(date, formatter);
                 return establishmentDate;
+            } catch (InputMismatchException inputMismatchException) {
+                System.out.println("Date is a String object. Try again.");
+            } catch (IllegalArgumentException illegalArgumentException) {
+                System.out.println("Invalid date format. Try again.");
+            }
+        }
+    }
+    public String receiveEstablishmentDateString() {
+        for ( ; ; ) {
+            try {
+                Scanner in = new Scanner(System.in);
+                System.out.println("Enter an establishment date in format yyyy-MM-dd.");
+                String date = in.nextLine();
+                if (date.equals("")) {
+                    System.out.println("Date value can't be empty.");
+                    continue;
+                }
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMATTER);
+                LocalDate establishmentDate = LocalDate.parse(date, formatter);
+                return date;
             } catch (InputMismatchException inputMismatchException) {
                 System.out.println("Date is a String object. Try again.");
             } catch (IllegalArgumentException illegalArgumentException) {
@@ -830,6 +850,24 @@ public class CollectionAdministrator {
                 String dateTime = in.nextLine();
                 LocalDateTime birthday = LocalDateTime.parse(dateTime, dateTimeFormatter);
                 return new Human(birthday);
+            }
+            catch(InputMismatchException inputMismatchException){
+                System.out.println("Input value must be String format.");
+            }
+            catch (DateTimeException dateTimeException){
+                System.out.println("Your data format is invalid. Try again.");
+            }
+        }
+    }
+
+    public Human receiveGovernorString(){
+        for( ; ; ){
+            try{
+                Scanner in = new Scanner(System.in);
+                System.out.println("Enter a date and time of birth with a format: yyyy-MM-dd hh:MM:ss.");
+                String dateTime = in.nextLine();
+                LocalDateTime birthday = LocalDateTime.parse(dateTime, dateTimeFormatter);
+                return new Human(dateTime);
             }
             catch(InputMismatchException inputMismatchException){
                 System.out.println("Input value must be String format.");

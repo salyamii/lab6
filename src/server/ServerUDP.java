@@ -11,9 +11,6 @@ import java.util.HashMap;
 
 public class ServerUDP extends Thread{
     private DatagramSocket socket;
-    private boolean running;
-    private byte[] bufReceive = new byte[65535];
-    private byte[] bufSend = new byte[65535];
     HashMap<String, SimpleMethod> option = new HashMap<>();
 
     public ServerUDP(CollectionAdministrator administrator){
@@ -42,8 +39,9 @@ public class ServerUDP extends Thread{
 
     public void run (){
         System.out.println("Server is online.");
-        running = true;
+        boolean running = true;
         while(running){
+            byte[] bufReceive = new byte[65535];
             DatagramPacket packet = new DatagramPacket(bufReceive, bufReceive.length);
             try{
                 socket.receive(packet);
@@ -64,7 +62,7 @@ public class ServerUDP extends Thread{
             else
                 sent = (received_arg.length == 1) ? option.get(received_arg[0]).run()
                     : option.get(received_arg[0]).run(received_arg[1]);
-            bufSend = sent.getBytes();
+            byte[] bufSend = sent.getBytes();
             DatagramPacket sendPacket = new DatagramPacket(bufSend, bufSend.length, address, port);
             try{
                 socket.send(sendPacket);

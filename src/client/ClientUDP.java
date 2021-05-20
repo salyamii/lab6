@@ -1,6 +1,8 @@
 package client;
 
 //import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import server.data.*;
 
@@ -79,6 +81,7 @@ public class ClientUDP {
                 }
                 try{
                     if(optionSplitted[0].equals("insert")){
+                        //mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
                         String out = optionSplitted[0] + " " + mapper.writeValueAsString(makeCity());
                         System.out.println(out);
                         buf = out.getBytes();
@@ -86,7 +89,8 @@ public class ClientUDP {
                         socket.send(packet);
                     }
                     else if(optionSplitted[0].equals("update_id")){
-                        String out = optionSplitted[0] + " " + mapper.writeValueAsString(makeCity());
+                        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                        String out = optionSplitted[0] + " " + mapper.writeValueAsString(updateCity());
                         buf = out.getBytes();
                         DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
                         socket.send(packet);
@@ -100,8 +104,9 @@ public class ClientUDP {
 
                     }
                 }
-                catch (Exception jsonProcessingException){
+                catch (JsonProcessingException jsonProcessingException){
                     System.out.println("Processing exception when sending..");
+                    System.exit(1);
                 }
                 DatagramPacket packet = new DatagramPacket(bufFromServer, bufFromServer.length);
                 socket.receive(packet);
@@ -151,15 +156,14 @@ public class ClientUDP {
             }
 
         }
-
     }
 
-    public City makeCity(){
-        LocalDateTime time = LocalDateTime.of(0,0,0,0,0,0);
-        City city = new City(0, receiveName(), receiveCoordinates(), time ,
+    public CityForParsing makeCity(){
+        CityForParsing cityForParsing = new CityForParsing(0, receiveName(), receiveCoordinates(),
                 receiveArea(), receivePopulation(), receiveMetersAboveSeaLevel(),
-                receiveEstablishmentDate(), receiveTelephoneCode(), receiveClimate(), receiveGovernor());
-        return city;
+                receiveEstablishmentDateString(), receiveTelephoneCode(),
+                receiveClimate(), receiveGovernorString());
+        return cityForParsing;
     }
 
 
@@ -421,6 +425,43 @@ public class ClientUDP {
                 String dateTime = in.nextLine();
                 LocalDateTime birthday = LocalDateTime.parse(dateTime, dateTimeFormatter);
                 return new Human(birthday);
+            }
+            catch(InputMismatchException inputMismatchException){
+                System.out.println("Input value must be String format.");
+            }
+            catch (DateTimeException dateTimeException){
+                System.out.println("Your data format is invalid. Try again.");
+            }
+        }
+    }
+    public String receiveEstablishmentDateString() {
+        for ( ; ; ) {
+            try {
+                Scanner in = new Scanner(System.in);
+                System.out.println("Enter an establishment date in format yyyy-MM-dd.");
+                String date = in.nextLine();
+                if (date.equals("")) {
+                    System.out.println("Date value can't be empty.");
+                    continue;
+                }
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMATTER);
+                LocalDate establishmentDate = LocalDate.parse(date, formatter);
+                return date;
+            } catch (InputMismatchException inputMismatchException) {
+                System.out.println("Date is a String object. Try again.");
+            } catch (IllegalArgumentException | DateTimeParseException exception) {
+                System.out.println("Invalid date format. Try again.");
+            }
+        }
+    }
+    public HumanForParsing receiveGovernorString(){
+        for( ; ; ){
+            try{
+                Scanner in = new Scanner(System.in);
+                System.out.println("Enter a date and time of birth with a format: yyyy-MM-dd hh:MM:ss.");
+                String dateTime = in.nextLine();
+                LocalDateTime birthday = LocalDateTime.parse(dateTime, dateTimeFormatter);
+                return new HumanForParsing(dateTime);
             }
             catch(InputMismatchException inputMismatchException){
                 System.out.println("Input value must be String format.");

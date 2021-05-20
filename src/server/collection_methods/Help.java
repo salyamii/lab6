@@ -17,7 +17,6 @@ public class Help extends SimpleMethod{
         for (String command : arrayOfCommands) {
             builder.append(command + '\n');
         }
-        getAdministrator().save();
         return builder.toString();
     }
 }

@@ -22,18 +22,23 @@ public class Human {
     @XmlElement
     private java.time.LocalDateTime birthday;
 
+    @XmlElement
+    private String birthdayString;
+
     /** Constructor for Human
      * @param birthday - birthday of a human
      */
     public Human(LocalDateTime birthday){
         this.birthday = birthday;
     }
+    public Human(String birthdayString){ this.birthdayString = birthdayString;}
 
     public Human(){}
 
     public LocalDateTime getBirthday() {
         return birthday;
     }
+    public String getBirthdayString(){ return birthdayString; }
 
     @Override
     public String toString() {
