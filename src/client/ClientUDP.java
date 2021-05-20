@@ -89,7 +89,7 @@ public class ClientUDP {
                         socket.send(packet);
                     }
                     else if(optionSplitted[0].equals("update_id")){
-                        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                        //mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
                         String out = optionSplitted[0] + " " + mapper.writeValueAsString(updateCity());
                         buf = out.getBytes();
                         DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
@@ -141,15 +141,15 @@ public class ClientUDP {
         socket.close();
     }
 
-    public City updateCity(){
+    public CityForParsing updateCity(){
         for( ; ; ){
             try{
                 System.out.print("Enter ID of a city: ");
                 long id = in.nextInt();
-                City city = new City(id, receiveName(), receiveCoordinates(), null,
+                return new CityForParsing(id, receiveName(), receiveCoordinates(),
                         receiveArea(), receivePopulation(), receiveMetersAboveSeaLevel(),
-                        receiveEstablishmentDate(), receiveTelephoneCode(), receiveClimate(), receiveGovernor());
-                return city;
+                        receiveEstablishmentDateString(), receiveTelephoneCode(),
+                        receiveClimate(), receiveGovernorString());
             }
             catch(InputMismatchException inputMismatchException){
                 System.out.println("Enter a long-type value, please.");
@@ -159,11 +159,10 @@ public class ClientUDP {
     }
 
     public CityForParsing makeCity(){
-        CityForParsing cityForParsing = new CityForParsing(0, receiveName(), receiveCoordinates(),
+        return new CityForParsing(0, receiveName(), receiveCoordinates(),
                 receiveArea(), receivePopulation(), receiveMetersAboveSeaLevel(),
                 receiveEstablishmentDateString(), receiveTelephoneCode(),
                 receiveClimate(), receiveGovernorString());
-        return cityForParsing;
     }
 
 

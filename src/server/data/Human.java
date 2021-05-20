@@ -42,6 +42,6 @@ public class Human {
 
     @Override
     public String toString() {
-        return birthday.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMATTER)).toString();
+        return birthday.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMATTER));
     }
 }

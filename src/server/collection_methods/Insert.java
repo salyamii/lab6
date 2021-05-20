@@ -29,9 +29,7 @@ public class Insert extends SimpleMethod{
     public String run(String str) {
         try{
             XmlMapper xmlMapper = new XmlMapper();
-            System.out.println(str);
             CityForParsing cityForParsing = xmlMapper.readValue(str, CityForParsing.class);
-            System.out.println(cityForParsing.getGovernor().getBirthday());
             City newCity = new City(getAdministrator().receiveID(), cityForParsing.getName(),
                     cityForParsing.getCoordinates(), getAdministrator().receiveCreationDate(),
                     cityForParsing.getArea(), cityForParsing.getPopulation(), cityForParsing.getMetersAboveSeaLevel(),
@@ -43,7 +41,6 @@ public class Insert extends SimpleMethod{
             return "A new city was inserted successfully.";
         }
         catch (Exception e){
-            e.printStackTrace();
             System.out.println("Incorrect deserializing.");
         }
         return "City wasn't inserted.";
