@@ -160,11 +160,12 @@ public class CollectionAdministrator {
         if(cities.isEmpty()){
             return "Collection is empty.\n";
         }
-        StringBuilder builder = new StringBuilder();
+        String result = "";
+        String parameter = "-";
         for(Map.Entry<Long, City> city : cities.entrySet()){
-            builder.append(city.getValue().toString() + "\n");
+            result = result + city.getValue().toString() + "\n";
         }
-        return builder.toString();
+        return result;
     }
     /**
      * Add element

@@ -126,23 +126,8 @@ public class ClientUDP {
             }
         }
        catch (IOException ioException){
-           System.err.println("The server is not available now. Reconnecting in 5 seconds. \n " +
-                   "To disconnect type {N} or press any key to continue.");
-           String ans = in.nextLine();
-           if(ans.equals("N")){
-               System.out.println("Disconnecting now.");
-               close();
-               System.exit(2);
-           }
-           try{
-               Thread.sleep(5000);
-           }
-           catch (InterruptedException interruptedException){
-               System.out.println("Disconnecting now because of interrupting.");
-               close();
-               System.exit(1);
-           }
-           System.out.println("Reconnecting...");
+           System.err.println("The server is not available now. Try later.");
+           System.exit(1);
        }
         catch(NoSuchElementException noSuchElementException){
             System.out.println("Input faced loop, skipped.");

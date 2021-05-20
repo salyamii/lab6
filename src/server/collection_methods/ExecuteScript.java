@@ -11,6 +11,6 @@ public class ExecuteScript extends SimpleMethod{
     public String run(String str) {
         getAdministrator().execute_script(str);
         getAdministrator().save();
-        return "Script: " + str + "was executed.";
+        return "Script: " + str + " was executed.";
     }
 }
