@@ -2,6 +2,7 @@ package server;
 
 import server.utility_methods.IsFileValid;
 
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class ServerMain {
@@ -16,12 +17,18 @@ public class ServerMain {
             for( ; ; ){
                 System.out.print("Enter a correct path to the XML file: ");
                 Scanner in = new Scanner(System.in);
-                String path = in.nextLine();
-                if(!IsFileValid.run(path)){
-                    continue;
+                try{
+                    String path = in.nextLine();
+                    if(!IsFileValid.run(path)){
+                        continue;
+                    }
+                    ServerUDP serverUDP = new ServerUDP(new CollectionAdministrator(path));
+                    serverUDP.run();
                 }
-                ServerUDP serverUDP = new ServerUDP(new CollectionAdministrator(path));
-                serverUDP.run();
+                catch (NoSuchElementException noSuchElementException){
+                    System.out.println("No files were inserted.");
+                }
+
             }
 
         }
