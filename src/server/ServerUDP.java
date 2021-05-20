@@ -3,10 +3,7 @@ package server;
 import server.collection_methods.*;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
 import java.util.HashMap;
 
 public class ServerUDP extends Thread{
@@ -16,6 +13,7 @@ public class ServerUDP extends Thread{
     public ServerUDP(CollectionAdministrator administrator){
         try{
             socket = new DatagramSocket(4242);
+            socket.setSoTimeout(10000);
         }
         catch (SocketException socketException){
             System.out.println("Something wrong with socket you chosen.");
@@ -46,7 +44,10 @@ public class ServerUDP extends Thread{
             try{
                 socket.receive(packet);
             }
-            catch (IOException ioException){
+            catch(SocketTimeoutException socketTimeoutException){
+                System.out.println("Waiting for a response...");
+                continue;
+            }catch (IOException ioException){
                 System.out.println("Invalid Object received.");
             }
             InetAddress address = packet.getAddress();
@@ -58,6 +59,7 @@ public class ServerUDP extends Thread{
             if (received_arg[0].equals("exit")){
                 sent = option.get(received_arg[0]).run();
                 running = false;
+                System.out.println("Server is offline.");
             }
             else
                 sent = (received_arg.length == 1) ? option.get(received_arg[0]).run()

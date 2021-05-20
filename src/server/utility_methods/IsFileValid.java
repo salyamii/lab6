@@ -5,7 +5,8 @@ import java.io.File;
 public class IsFileValid {
     public static boolean run(String path){
         File f = new File(path);
-        if(f.exists() && f.canWrite() && f.canRead() && getFileExtension(path).equals("xml")){
+        if(f.exists() && f.canWrite() && f.canRead() &&
+                (getFileExtension(path).equals("xml") | getFileExtension(path).equals("txt"))){
             return true;
         }
         else

@@ -1,7 +1,7 @@
 package client;
 
 //import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.JsonProcessingException;
+//import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import server.data.*;
@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashSet;
 import java.util.InputMismatchException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class ClientUDP {
@@ -35,6 +36,7 @@ public class ClientUDP {
     public ClientUDP() {
         try {
             socket = new DatagramSocket();
+            socket.setSoTimeout(10000);
             address = InetAddress.getByName("localhost");
         } catch (UnknownHostException unknownHostException) {
             System.out.println("Can't find IP. Fix it.");
@@ -73,17 +75,19 @@ public class ClientUDP {
                         break;
                     System.out.print("Incorrect option! Try help for information.\n Enter an option: ");
                 }
-                if(optionSplitted[0].equals("exit")){
-                    running = false;
-                    System.out.println("You exited an application.");
-                    socket.close();
-                    System.exit(0);
-                }
                 try{
-                    if(optionSplitted[0].equals("insert")){
+                    if(optionSplitted[0].equals("exit")){
+                        running = false;
+                        buf = ("exit").getBytes();
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
+                        socket.send(packet);
+                        System.out.println("You exited an application.");
+                        socket.close();
+                        System.exit(0);
+                    }
+                   else if(optionSplitted[0].equals("insert")){
                         //mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
                         String out = optionSplitted[0] + " " + mapper.writeValueAsString(makeCity());
-                        System.out.println(out);
                         buf = out.getBytes();
                         DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
                         socket.send(packet);
@@ -104,15 +108,21 @@ public class ClientUDP {
 
                     }
                 }
-                catch (JsonProcessingException jsonProcessingException){
+                catch (Exception jsonProcessingException){
                     System.out.println("Processing exception when sending..");
                     System.exit(1);
                 }
                 DatagramPacket packet = new DatagramPacket(bufFromServer, bufFromServer.length);
-                socket.receive(packet);
-                System.out.println("check");
-                String whatReceived = new String(packet.getData(), 0, packet.getLength());
-                System.out.println(whatReceived);
+                System.out.println("Receiving packet...");
+                try{
+                    socket.receive(packet);
+                    String whatReceived = new String(packet.getData(), 0, packet.getLength());
+                    System.out.println(whatReceived);
+                }
+                catch(SocketTimeoutException socketTimeoutException){
+                    System.out.println("Server is not responding.");
+                }
+
             }
         }
        catch (IOException ioException){
@@ -134,6 +144,9 @@ public class ClientUDP {
            }
            System.out.println("Reconnecting...");
        }
+        catch(NoSuchElementException noSuchElementException){
+            System.out.println("Input faced loop, skipped.");
+        }
     }
 
 
@@ -145,16 +158,20 @@ public class ClientUDP {
         for( ; ; ){
             try{
                 System.out.print("Enter ID of a city: ");
-                long id = in.nextInt();
+                long id;
+                try {
+                    id = in.nextInt();
+                }
+                catch (NoSuchElementException noSuchElementException){
+                    id = 0;
+                }
                 return new CityForParsing(id, receiveName(), receiveCoordinates(),
                         receiveArea(), receivePopulation(), receiveMetersAboveSeaLevel(),
                         receiveEstablishmentDateString(), receiveTelephoneCode(),
                         receiveClimate(), receiveGovernorString());
             }
-            catch(InputMismatchException inputMismatchException){
-                System.out.println("Enter a long-type value, please.");
+            catch(InputMismatchException inputMismatchException){ System.out.println("Enter a long-type value, please.");
             }
-
         }
     }
 
@@ -199,7 +216,13 @@ public class ClientUDP {
             try{
                 Scanner in = new Scanner(System.in);
                 System.out.println("Enter X coordinate in a float type. Value must be greater than -944 and can't be empty.");
-                float x = in.nextFloat();
+                float x;
+                try{
+                    x = in.nextFloat();
+                }
+                catch(NoSuchElementException noSuchElementException){
+                    x = 0;
+                }
                 String strX = Float.toString(x);
                 if(x < -944){
                     System.out.println("Value can't be lower than -944.");
@@ -226,7 +249,13 @@ public class ClientUDP {
             try{
                 Scanner in = new Scanner(System.in);
                 System.out.print("Enter Y coordinate in a int type. Value can't be empty.");
-                int y = in.nextInt();
+                int y;
+                try{
+                    y = in.nextInt();
+                }
+                catch(NoSuchElementException noSuchElementException){
+                    y = 0;
+                }
                 String strY = Integer.toString(y);
                 if(strY.equals("")){
                     System.out.println("Value can't be empty.");
@@ -255,7 +284,13 @@ public class ClientUDP {
             try {
                 System.out.println("Enter a number of area in double format. Value must be more that 0 and can't be empty.");
                 Scanner in = new Scanner(System.in);
-                double num = in.nextDouble();
+                double num;
+                try{
+                    num = in.nextDouble();
+                }
+                catch(NoSuchElementException noSuchElementException){
+                    num = 0;
+                }
                 String strNum = Double.toString(num);
                 if (num <= 0) {
                     System.out.println("Value must be more that 0.");
@@ -282,7 +317,13 @@ public class ClientUDP {
             try{
                 Scanner in = new Scanner(System.in);
                 System.out.println("Enter number of population. Value must be greater than 0 and can't be empty.");
-                int pop = in.nextInt();
+                int pop;
+                try{
+                    pop = in.nextInt();
+                }
+                catch(NoSuchElementException noSuchElementException){
+                    pop = 1;
+                }
                 String strPop = Integer.toString(pop);
                 if(pop < 0){
                     System.out.println("Value must be greater than zero.");
@@ -309,7 +350,13 @@ public class ClientUDP {
             try{
                 Scanner in = new Scanner(System.in);
                 System.out.println("Enter meters above sea level. Value can't be empty.");
-                float meters = in.nextFloat();
+                float meters;
+                try{
+                    meters = in.nextFloat();
+                }
+                catch (NoSuchElementException noSuchElementException){
+                    meters = 0;
+                }
                 String strMeters = Float.toString(meters);
                 if(strMeters.equals("")){
                     System.out.println("Value can't be empty.");
@@ -357,7 +404,13 @@ public class ClientUDP {
             try{
                 Scanner in = new Scanner(System.in);
                 System.out.println("Enter a telephone code. Value must be greater than 0, but lower than 100000.");
-                int code = in.nextInt();
+                int code;
+                try{
+                    code = in.nextInt();
+                }
+                catch(NoSuchElementException noSuchElementException){
+                    code = 1;
+                }
                 String strCode = Integer.toString(code);
                 if(strCode.equals("")){
                     System.out.println("Code can't be empty.");
@@ -392,7 +445,13 @@ public class ClientUDP {
                 System.out.println("3 - Subarctic");
                 System.out.println("4 - Tundra");
                 System.out.print("Choose 1, 2, 3 or 4: ");
-                int number = in.nextInt();
+                int number;
+                try{
+                    number = in.nextInt();
+                }
+                catch(NoSuchElementException noSuchElementException){
+                    number = 1;
+                }
                 switch (number){
                     case 1:
                         return Climate.HUMIDCONTINENTAL;
@@ -438,7 +497,13 @@ public class ClientUDP {
             try {
                 Scanner in = new Scanner(System.in);
                 System.out.println("Enter an establishment date in format yyyy-MM-dd.");
-                String date = in.nextLine();
+                String date;
+                try{
+                    date = in.nextLine();
+                }
+                catch(NoSuchElementException noSuchElementException){
+                    date = "1997-01-01";
+                }
                 if (date.equals("")) {
                     System.out.println("Date value can't be empty.");
                     continue;
@@ -458,7 +523,13 @@ public class ClientUDP {
             try{
                 Scanner in = new Scanner(System.in);
                 System.out.println("Enter a date and time of birth with a format: yyyy-MM-dd hh:MM:ss.");
-                String dateTime = in.nextLine();
+                String dateTime;
+                try{
+                    dateTime = in.nextLine();
+                }
+                catch(NoSuchElementException noSuchElementException){
+                    dateTime = "1997-01-01 00:00:00";
+                }
                 LocalDateTime birthday = LocalDateTime.parse(dateTime, dateTimeFormatter);
                 return new HumanForParsing(dateTime);
             }

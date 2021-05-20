@@ -47,7 +47,7 @@ public class UpdateID extends SimpleMethod{
             }
         }
         catch (Exception exception){
-            exception.printStackTrace();
+            //exception.printStackTrace();
             return "Incorrect deserializing.";
         }
 

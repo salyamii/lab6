@@ -94,9 +94,9 @@ public class CollectionAdministrator {
         helper.add("update_id {id} - update an element with inserted id");
         helper.add("remove_key {id} - delete an element from collection by key");
         helper.add("clear - remove all elements from collection");
-        helper.add("save - saving the collection to the xml file");
+        //helper.add("save - saving the collection to the xml file");
         helper.add("execute_script {file_name} - executing script from the file");
-        helper.add("exit - exit the program (without saving)");
+        //helper.add("exit - exit the program (without saving)");
         helper.add("remove_greater {population} - removing elements with greater population field");
         helper.add("remove_greater_key {id} - remove elements with greater id (key)");
         helper.add("remove_lower_key {id} - remove elements with lower id (key)");
@@ -138,7 +138,7 @@ public class CollectionAdministrator {
      * @return
      */
     public String getInfo(){
-        return "Type of collection: HashMap\nInitialization time and date" + initializationDate +
+        return "Type of collection: HashMap\nInitialization time and date: " + initializationDate +
                 "\nAmount of elements in the collection: " + cities.size() +"\nCollection manager is active: " + running;
     }
 

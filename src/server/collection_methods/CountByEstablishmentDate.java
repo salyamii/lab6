@@ -24,10 +24,10 @@ public class CountByEstablishmentDate extends SimpleMethod{
                     counter++;
                 }
             }
-            return String.valueOf(counter) + "cities.";
+            return String.valueOf(counter) + " cities.";
         }
         catch (DateTimeParseException dateTimeParseException){
-            return "Data is invalid.";
+            return "Data must be xxxx-xx-xx format. Try again.";
         }
     }
 }
