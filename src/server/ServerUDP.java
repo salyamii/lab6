@@ -51,6 +51,7 @@ public class ServerUDP extends Thread{
                 String exit = in.nextLine();
                 exit = exit.toLowerCase().trim();
                 if(exit.equals("exit"))
+                    socket.close();
                     System.exit(0);
                 continue;
             }catch (IOException ioException){
