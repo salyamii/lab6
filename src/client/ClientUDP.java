@@ -416,7 +416,8 @@ public class ClientUDP {
                     code = in.nextInt();
                 }
                 catch(NoSuchElementException noSuchElementException){
-                    code = 1;
+                    System.out.println("Value of code must be int-type. Try again.");
+                    continue;
                 }
                 String strCode = Integer.toString(code);
                 if(strCode.equals("")){
