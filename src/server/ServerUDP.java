@@ -5,9 +5,11 @@ import server.collection_methods.*;
 import java.io.IOException;
 import java.net.*;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class ServerUDP extends Thread{
     private DatagramSocket socket;
+    Scanner in = new Scanner(System.in);
     HashMap<String, SimpleMethod> option = new HashMap<>();
 
     public ServerUDP(CollectionAdministrator administrator){
@@ -45,7 +47,11 @@ public class ServerUDP extends Thread{
                 socket.receive(packet);
             }
             catch(SocketTimeoutException socketTimeoutException){
-                System.out.println("Waiting for a response...");
+                System.out.println("Client does not respond. To turn off the server enter exit or enter any key to continue");
+                String exit = in.nextLine();
+                exit = exit.toLowerCase().trim();
+                if(exit.equals("exit"))
+                    System.exit(0);
                 continue;
             }catch (IOException ioException){
                 System.out.println("Invalid Object received.");
@@ -58,8 +64,7 @@ public class ServerUDP extends Thread{
             String sent;
             if (received_arg[0].equals("exit")){
                 sent = option.get(received_arg[0]).run();
-                running = false;
-                System.out.println("Server is offline.");
+                //System.out.println("Server is offline.");
             }
             else
                 sent = (received_arg.length == 1) ? option.get(received_arg[0]).run()
@@ -72,6 +77,7 @@ public class ServerUDP extends Thread{
             catch(IOException ioException){
                 System.out.println("Invalid Object sent.");
             }
+
         }
         socket.close();
     }

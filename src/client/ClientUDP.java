@@ -13,10 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.HashSet;
-import java.util.InputMismatchException;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
+import java.util.*;
 
 public class ClientUDP {
     private DatagramSocket socket;
@@ -59,7 +56,26 @@ public class ClientUDP {
         options.add("count_by_establishment_date");
         options.add("count_less_than_establishment_date");
     }
+    private final ArrayList<String> helper = new ArrayList<>();
+    {
+        helper.add("help - display help for available commands.");
+        helper.add("info - print all information about collection.");
+        helper.add("show - print all elements in collection");
+        helper.add("insert - add a new element");
+        helper.add("update_id {id} - update an element with inserted id");
+        helper.add("remove_key {id} - delete an element from collection by key");
+        helper.add("clear - remove all elements from collection");
+        //helper.add("save - saving the collection to the xml file");
+        helper.add("execute_script {file_name} - executing script from the file");
+        //helper.add("exit - exit the program (without saving)");
+        helper.add("remove_greater {population} - removing elements with greater population field");
+        helper.add("remove_greater_key {id} - remove elements with greater id (key)");
+        helper.add("remove_lower_key {id} - remove elements with lower id (key)");
+        helper.add("group_counting_by_population - group elements by population");
+        helper.add("count_by_establishment_date {establishmentDate} - display amount of elements with inserted establishment date");
+        helper.add("count_less_than_establishment_date {establishmentDate} - display amount of elements that have lower value of establishmentDate");
 
+    }
 
     public void sendClient() {
         try{
@@ -73,7 +89,7 @@ public class ClientUDP {
                     optionSplitted = option.trim().split(" ", 2);
                     if (options.contains(optionSplitted[0]))
                         break;
-                    System.out.print("Incorrect option! Try help for information.\n Enter an option: ");
+                    System.out.print("Incorrect option! Try help for information.\nEnter an option: ");
                 }
                 try{
                     if(optionSplitted[0].equals("exit")){
@@ -99,6 +115,12 @@ public class ClientUDP {
                         DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
                         socket.send(packet);
                     }
+                    else if(optionSplitted[0].equals("help")){
+                        for (String s : helper) {
+                            System.out.println(s);
+                        }
+                        continue;
+                    }
                     else{
 
                         String out = optionSplitted.length == 1 ? optionSplitted[0] : optionSplitted[0] + " " + optionSplitted[1];
@@ -113,7 +135,7 @@ public class ClientUDP {
                     System.exit(1);
                 }
                 DatagramPacket packet = new DatagramPacket(bufFromServer, bufFromServer.length);
-                System.out.println("Receiving packet...");
+                //System.out.println("Receiving packet...");
                 try{
                     socket.receive(packet);
                     String whatReceived = new String(packet.getData(), 0, packet.getLength());
@@ -126,11 +148,11 @@ public class ClientUDP {
             }
         }
        catch (IOException ioException){
-           System.err.println("The server is not available now. Try later.");
+           System.err.println("\nThe server is not available now. Try later.");
            System.exit(1);
        }
         catch(NoSuchElementException noSuchElementException){
-            System.out.println("Input faced loop, skipped.");
+            System.out.println("\nInput faced loop, skipped.");
         }
     }
 
