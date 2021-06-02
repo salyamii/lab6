@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class ServerMain {
+    private static String path;
     public static void main(String[] args) {
         System.out.println("Server starts running...");
         try{
@@ -18,7 +19,7 @@ public class ServerMain {
                 System.out.print("Enter a correct path to the XML file: ");
                 Scanner in = new Scanner(System.in);
                 try{
-                    String path = in.nextLine();
+                    path = in.nextLine();
                     if(!IsFileValid.run(path)){
                         continue;
                     }
@@ -32,5 +33,9 @@ public class ServerMain {
             }
 
         }
+    }
+
+    public static String getPath() {
+        return path;
     }
 }

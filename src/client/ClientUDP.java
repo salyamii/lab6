@@ -2,8 +2,10 @@ package client;
 
 //import com.fasterxml.jackson.core.JsonProcessingException;
 //import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
 import server.data.*;
 
 import java.io.IOException;
@@ -38,6 +40,7 @@ public class ClientUDP {
         } catch (UnknownHostException unknownHostException) {
             System.out.println("Can't find IP. Fix it.");
         } catch (SocketException socketException) {
+            //C:\Users\happy\Desktop\ITMO\OldLR5\script.txt
             System.out.println("The socket could not be opened, or the socket could not bind to the specified local port.");
         }
         options.add("help");
@@ -97,29 +100,78 @@ public class ClientUDP {
                         buf = ("exit").getBytes();
                         DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
                         socket.send(packet);
+
+
                         System.out.println("You exited an application.");
                         socket.close();
                         System.exit(0);
                     }
                    else if(optionSplitted[0].equals("insert")){
-                        //mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                        //checking if server is online
+                        String check = "check";
+                        buf = check.getBytes();
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
+                        socket.send(packet);
+                        packet = new DatagramPacket(bufFromServer, bufFromServer.length);
+                        socket.receive(packet);
+                        String whatReceived = new String(packet.getData(), 0, packet.getLength());
+                        System.out.println(whatReceived);
+
                         String out = optionSplitted[0] + " " + mapper.writeValueAsString(makeCity());
                         buf = out.getBytes();
-                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
+                        packet = new DatagramPacket(buf, buf.length, address, 4242);
                         socket.send(packet);
                     }
                     else if(optionSplitted[0].equals("update_id")){
-                        //mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-                        String out = optionSplitted[0] + " " + mapper.writeValueAsString(updateCity());
-                        buf = out.getBytes();
+                        //checking if collection has element with certain id
+                        String checkId = "check_id " + optionSplitted[1];
+                        buf = checkId.getBytes();
                         DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
                         socket.send(packet);
+                        packet = new DatagramPacket(bufFromServer, bufFromServer.length);
+                        socket.receive(packet);
+                        String whatReceived = new String(packet.getData(), 0, packet.getLength());
+
+                        if(whatReceived.equals("okay")){
+                            String out = optionSplitted[0] + " " + mapper.writeValueAsString(updateCity(Long.parseLong(optionSplitted[1])));
+                            buf = out.getBytes();
+                            packet = new DatagramPacket(buf, buf.length, address, 4242);
+                            socket.send(packet);
+                        }
+                        else{
+                            System.out.print(whatReceived);
+                            continue;
+                        }
                     }
                     else if(optionSplitted[0].equals("help")){
                         for (String s : helper) {
                             System.out.println(s);
                         }
                         continue;
+                    }
+                    else if(optionSplitted[0].equals("info")){
+                        String out = "info";
+                        buf = out.getBytes();
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
+                        socket.send(packet);
+                    }
+                    else if(optionSplitted[0].equals("show")){
+                        String out = "show";
+                        buf = out.getBytes();
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
+                        socket.send(packet);
+                    }
+                    else if(optionSplitted[0].equals("clear")){
+                        String out = "clear";
+                        buf = out.getBytes();
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
+                        socket.send(packet);
+                    }
+                    else if(optionSplitted[0].equals("group_counting_by_population")){
+                        String out = "group_counting_by_population";
+                        buf = out.getBytes();
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4242);
+                        socket.send(packet);
                     }
                     else{
 
@@ -130,9 +182,17 @@ public class ClientUDP {
 
                     }
                 }
-                catch (Exception jsonProcessingException){
+                catch (JsonProcessingException jsonProcessingException){
                     System.out.println("Processing exception when sending..");
                     System.exit(1);
+                }
+                catch (SocketTimeoutException socketTimeoutException){
+                    System.out.println("Server is offline.");
+                    continue;
+                }
+                catch (ArrayIndexOutOfBoundsException arrayIndexOutOfBoundsException){
+                    System.out.println("You forgot to insert ID of a city.");
+                    continue;
                 }
                 DatagramPacket packet = new DatagramPacket(bufFromServer, bufFromServer.length);
                 //System.out.println("Receiving packet...");
@@ -161,17 +221,17 @@ public class ClientUDP {
         socket.close();
     }
 
-    public CityForParsing updateCity(){
+    public CityForParsing updateCity(long id){
         for( ; ; ){
             try{
-                System.out.print("Enter ID of a city: ");
+                /*System.out.print("Enter ID of a city: ");
                 long id;
                 try {
                     id = in.nextInt();
                 }
                 catch (NoSuchElementException noSuchElementException){
                     id = 0;
-                }
+                }*/
                 return new CityForParsing(id, receiveName(), receiveCoordinates(),
                         receiveArea(), receivePopulation(), receiveMetersAboveSeaLevel(),
                         receiveEstablishmentDateString(), receiveTelephoneCode(),

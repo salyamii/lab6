@@ -256,13 +256,15 @@ public class CollectionAdministrator {
      * Execute from a file
      * @param nameOfFile
      */
+    HashSet<String> ifRecursive = new HashSet<>();
+    boolean flag = true;
     public void execute_script (String nameOfFile){
         try{
+            ifRecursive.add(nameOfFile);
             File file = new File(nameOfFile);
             Scanner sc = new Scanner(file);
             String []finalCommand;
             String command;
-            if(!recursionDetector(nameOfFile)){
                 while(sc.hasNextLine()){
                     command = sc.nextLine();
                     finalCommand = command.trim().toLowerCase().split(" ", 2);
@@ -290,7 +292,13 @@ public class CollectionAdministrator {
                                 clear();
                                 break;
                             case "execute_script":
-                                execute_script(finalCommand[1]);
+                                if(!ifRecursive.contains(finalCommand[1])){
+                                    ifRecursive.add(finalCommand[1]);
+                                    execute_script(finalCommand[1]);
+                                }
+                                else{
+                                    System.out.println("Faced recursive script.");
+                                }
                                 break;
                             case "exit":
                                 exit();
@@ -319,10 +327,6 @@ public class CollectionAdministrator {
                         System.out.println("Argument of command is absent. Check help for information.");
                     }
                 }
-            }
-            else{
-                System.out.println("This script is recursive! Fix the script or use another one.");
-            }
         }
         catch(FileNotFoundException noSuchElementException){
             System.out.println("File can't be read. Program will be finished.");
@@ -879,7 +883,7 @@ public class CollectionAdministrator {
         }
     }
 
-    public HashMap<Long, City> getCities() {
+    public HashMap<Long, server.data.City> getCities() {
         return cities;
     }
 }

@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class ServerUDP extends Thread{
+    private final int TICKS_TO_DISCONNECT = 10;
+    private int counter = 0;
     private DatagramSocket socket;
     Scanner in = new Scanner(System.in);
     HashMap<String, SimpleMethod> option = new HashMap<>();
@@ -47,12 +49,23 @@ public class ServerUDP extends Thread{
                 socket.receive(packet);
             }
             catch(SocketTimeoutException socketTimeoutException){
-                System.out.println("Client does not respond. To turn off the server enter exit or enter any key to continue");
-                String exit = in.nextLine();
-                exit = exit.toLowerCase().trim();
-                if(exit.equals("exit"))
-                    socket.close();
-                    System.exit(0);
+                System.out.println("Client does not respond...");
+                counter++;
+                if(counter == TICKS_TO_DISCONNECT){
+                    System.out.print("Disconnect?\nY - to disconnect\nAny key - to stay online\nsave - to save collection forcefully: ");
+                    String exit = in.nextLine();
+                    exit = exit.trim();
+                    if(exit.equals("Y")) {
+                        socket.close();
+                        System.out.println("Server is offline.");
+                        System.exit(0);
+                    }else if(exit.equals("save")){
+                        CollectionAdministrator adm = new CollectionAdministrator(ServerMain.getPath());
+                        adm.save();
+                        System.out.println("Collection was saved forcefully.");
+                    }
+                    counter = 0;
+                }
                 continue;
             }catch (IOException ioException){
                 System.out.println("Invalid Object received.");
@@ -66,6 +79,24 @@ public class ServerUDP extends Thread{
             if (received_arg[0].equals("exit")){
                 sent = option.get(received_arg[0]).run();
                 //System.out.println("Server is offline.");
+            }
+            else if(received_arg[0].equals("check")){
+                sent = "Server is online.";
+            }
+            else if(received_arg[0].equals("check_id")){
+                CollectionAdministrator adm = new CollectionAdministrator(ServerMain.getPath());
+                HashMap<Long, server.data.City> temp = adm.getCities();
+                try{
+                    if(temp.containsKey(Long.parseLong(received_arg[1]))){
+                        sent = "okay";
+                    }
+                    else
+                        sent = "You are trying to update non-existing city.\n";
+                }
+                catch (NumberFormatException numberFormatException){
+                    sent = "Invalid format of ID.\n";
+                }
+
             }
             else
                 sent = (received_arg.length == 1) ? option.get(received_arg[0]).run()
